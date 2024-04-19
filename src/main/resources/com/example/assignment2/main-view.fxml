@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.assignment2.RouteFinderController">
+
+  <MenuBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="29.0" prefWidth="800.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <Menu mnemonicParsing="false" text="File">
+      <MenuItem mnemonicParsing="false" onAction="#openFileExplorer" text="Open" />
+      <MenuItem mnemonicParsing="false" text="Close" />
+    </Menu>
+    <Menu mnemonicParsing="false" text="Edit">
+      <MenuItem mnemonicParsing="false" text="Convert to Monochrome" />
+      <MenuItem mnemonicParsing="false" text="Delete" />
+    </Menu>
+    <Menu mnemonicParsing="false" text="Help">
+      <MenuItem mnemonicParsing="false" text="About" />
+    </Menu>
+  </MenuBar>
+  <HBox alignment="CENTER" layoutX="14.0" layoutY="39.0" spacing="10">
+    <ImageView fx:id="imageView" fitHeight="339.0" fitWidth="374.0" onMouseClicked="#mouseClick" pickOnBounds="true" preserveRatio="true" />
+  </HBox>
+</AnchorPane>
