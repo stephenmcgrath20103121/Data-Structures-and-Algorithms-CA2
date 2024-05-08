@@ -1,23 +1,20 @@
 package com.example.assignment2;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.stage.FileChooser;
-
-import java.io.File;
-import java.net.URL;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class RouteFinderController {
@@ -26,110 +23,48 @@ public class RouteFinderController {
     @FXML
     private ImageView imageView;
 
-    public static RouteFinderController maincon;
+    @FXML
+    public AnchorPane imageViewPane;
 
     private Graph graph = new Graph(); //Will be used to store the graph
 
     private Map<String, Landmark> landmarks = new HashMap<>(); //Will be used to store all landmarks
 
     @FXML
+    public MenuButton startLandmark;
+    @FXML
+    public MenuButton destinationLandmark;
+    private Landmark selectedStartLandmark;
+    private Landmark selectedDestinationLandmark;
+    private Circle startLandmarkCircle;
+    private Circle destinationLandmarkCircle;
+
+    @FXML
     public Button clearMap;
 
     @FXML
-    public MenuButton waypointLandmark;
-
-    @FXML
-    public AnchorPane mapPane;
-
-    @FXML
-    public Button bfsSearchButton;
+    public Button bfsButton;
 
     @FXML
     public ListView routeOutput;
 
-    @FXML
-    public Button initialiseMapButton;
-
-    @FXML
-    public MenuButton startLandmark;
-
-    @FXML
-    public MenuButton destinationLandmark;
-
-    private Landmark selectedWaypointLandmark;
-
-    private Circle firstLandmarkRing;
-
-    private Circle destinationLandmarkCircle;
-
-    private Circle firstLandmarkCircle;
-
-    private Landmark selectedDestinationLandmark;
-
-    private Landmark firstSelectedLandmark;
-
-    private Circle destinationLandmarkOuterRing;
-
     private boolean isMapPopulated = false;
 
-    @FXML
-    protected void openFileExplorer(){
-        FileChooser fileChooser= new FileChooser();
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files","*.jpg"));
+    //private Landmark selectedWaypointLandmark;
 
-        File selectedFile = fileChooser.showOpenDialog(null);
-        if(selectedFile != null) {
-            Image image = new Image(selectedFile.toURI().toString());
-            displayImage = image;
-            Image bwImage = convertImageToBlackAndWhite(displayImage);
-            imageView.setImage(image);
-        }
+    //@FXML
+    //public MenuButton waypointLandmark;
+
+    public void initialize () throws FileNotFoundException {
+        initialiseMap();
+        //addLandmarkLinks();
+        //processBwImage();
     }
 
-    @FXML
-    private void mouseClick(MouseEvent event){
-        if (displayImage != null){
-            double x = event.getX();
-            double y = event.getY();
-
-            int roundedX = (int) (x/imageView.getBoundsInLocal().getWidth() * displayImage.getWidth());
-            int roundedY = (int) (y/imageView.getBoundsInLocal().getHeight() * displayImage.getHeight());
-
-            int imageWidth = (int) displayImage.getWidth();
-            int imageHeight = (int) displayImage.getHeight();
-
-            if(roundedX >= 0 && roundedX < imageWidth && roundedY >= 0 && roundedY < imageHeight){
-                Color clickedPixel = displayImage.getPixelReader().getColor(roundedX,roundedY);
-            }
-        }
-    }
-
-    @FXML
-    protected Image convertImageToBlackAndWhite(Image image){
-
-        PixelReader imageReader = image.getPixelReader();
-        int width = (int) image.getWidth();
-        int height = (int) image.getHeight();
-
-        WritableImage writableImage = new WritableImage(width,height);
-        PixelWriter writableImageWriter = writableImage.getPixelWriter();
-
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                Color currentColor=imageReader.getColor(x,y);
-
-                if ((currentColor.getRed()>=0.825)&&(currentColor.getGreen()>=0.825)&&(currentColor.getBlue()>=0.825)){
-                        writableImageWriter.setColor(x,y,Color.WHITE);
-                }else{
-                    writableImageWriter.setColor(x,y,Color.BLACK);
-                }
-            }
-        }
-
-        return writableImage;
-    }
-
-    public void initialiseMap() {
+    public void initialiseMap() throws FileNotFoundException {
+        Image image = new Image(new FileInputStream("src/main/java/com/example/Paris.JPG"));
+        displayImage = image;
+        imageView.setImage(image);
         // Check if the map is populated
         if (isMapPopulated) {
             System.out.println("Map already populated");
@@ -159,7 +94,7 @@ public class RouteFinderController {
         for (Map.Entry<String, Road> entry : roads.entrySet()) {
             System.out.println(entry.getKey());
             for (Landmark landmark : entry.getValue().getLandmarks()) {
-                System.out.println("\t" + landmark.getLandmarkName() + " (" + landmark.getXcoord() + "," + landmark.getYcoord() + ")");
+                System.out.println("\t" + landmark.getLandmarkName() + " (" + landmark.getX() + "," + landmark.getY() + ")");
             }
             System.out.println("\n");
         }
@@ -205,14 +140,14 @@ public class RouteFinderController {
         parentMenuButton.setText(landmark.getLandmarkName());
 
         if (parentMenuButton == startLandmark) {
-            firstSelectedLandmark = landmark;
+            selectedStartLandmark = landmark;
             drawFirstCircle(landmark);
         } else if (parentMenuButton == destinationLandmark) {
             selectedDestinationLandmark = landmark;
             drawDestinationCircle(landmark);
         }
     }
-    
+
 
     private Map<String, Road> parseCSVData(String csvData) {
         Map<String, Road> roads = new HashMap<>();
@@ -260,12 +195,12 @@ public class RouteFinderController {
                 Landmark previousLandmark = currentLineLandmarks.get(currentLineLandmarks.size() - 2);
 
                 // Calculate the distance between the current and previous landmarks
-                double distance = Math.sqrt(Math.pow(landmarkObj.getXcoord() - previousLandmark.getXcoord(), 2)
-                        + Math.pow(landmarkObj.getYcoord() - previousLandmark.getYcoord(), 2));
+                double distance = Math.sqrt(Math.pow(landmarkObj.getX() - previousLandmark.getX(), 2)
+                        + Math.pow(landmarkObj.getY() - previousLandmark.getY(), 2));
                 // Print the distances
                 System.out.println("Calculating distance between " + previousLandmark.getLandmarkName() + " and " + landmarkObj.getLandmarkName());
-                System.out.println("Previous landmark coordinates: " + previousLandmark.getXcoord() + ", " + previousLandmark.getYcoord());
-                System.out.println("Current landmark coordinates: " + landmarkObj.getXcoord() + ", " + landmarkObj.getYcoord());
+                System.out.println("Previous landmark coordinates: " + previousLandmark.getX() + ", " + previousLandmark.getY());
+                System.out.println("Current landmark coordinates: " + landmarkObj.getX() + ", " + landmarkObj.getY());
                 System.out.println("Calculated distance: " + distance);
 
                 // Add the current landmark as a neighbor to the previous landmark, if they are not already neighbors
@@ -285,113 +220,99 @@ public class RouteFinderController {
         return roads;
     }
 
-    public void drawShortestPath(Path shortestRoute) {
-        // Remove any existing lines from the mapPane
-        mapPane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
-        // Get the list of landmarks in the shortest path
-        List<Landmark> shortestPath = shortestRoute.getPath();
-        // Draw a line between each pair of adjacent landmarks in the shortest path
-        for (int i = 0; i < shortestPath.size() - 1; i++) {
-            Landmark start = shortestPath.get(i);
-            Landmark end = shortestPath.get(i + 1);
-
-            drawLineBetweenLandmarks(start, end, Color.PURPLE);
-        }
+    public void drawLine() {
+        Canvas canvas = new Canvas(displayImage.getWidth(), displayImage.getHeight());
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.drawImage(displayImage, 0, 0, displayImage.getWidth(), displayImage.getHeight());
+        gc.setStroke(Color.ORANGE);
+        gc.setLineWidth(5);
+        gc.strokeLine(selectedStartLandmark.getX(),selectedStartLandmark.getY(), selectedDestinationLandmark.getX(), selectedDestinationLandmark.getY());
+        WritableImage image = new WritableImage((int) displayImage.getWidth(), (int) displayImage.getHeight());
+        canvas.snapshot(null, image);
+        imageView.setImage(image);
     }
 
-    private void drawLineBetweenLandmarks(Landmark start, Landmark end, Color color) {
-        // Calculate the actual coordinates of the start and end landmarks on the mapPane
-        Point2D startPoint = calculateActualCoordinates(start);
-        Point2D endPoint = calculateActualCoordinates(end);
-        // Create a new line with the calculated start and end points and set its color and width
-        javafx.scene.shape.Line line = new javafx.scene.shape.Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
-        line.setStroke(color);
-        line.setStrokeWidth(4);
-        // Add the line to the mapPane
-        mapPane.getChildren().add(line);
+    public void clearMap() throws FileNotFoundException {
+        //resets the image back to the original
+        Image image = new Image(new FileInputStream("src/main/java/com/example/Paris.JPG"));
+        imageView.setImage(image);
     }
 
     private Point2D calculateActualCoordinates(Landmark landmark) {
         double scaleX = imageView.getBoundsInLocal().getWidth() / imageView.getImage().getWidth();
         double scaleY = imageView.getBoundsInLocal().getHeight() / imageView.getImage().getHeight();
 
-        double actualX = landmark.getXcoord() * scaleX;
-        double actualY = landmark.getYcoord() * scaleY;
+        double actualX = landmark.getX() * scaleX;
+        double actualY = landmark.getY() * scaleY;
 
         return new Point2D(actualX, actualY);
     }
 
-    private void createLandmarkCircle(Circle innerCircle, Circle outerRing, Landmark landmark, Color color) {
+    private void createLandmarkCircle(Circle innerCircle, Landmark landmark, Color color) {
         // Calculate the coordinates of the landmark on the mapPane
         Point2D actualCoordinates = calculateActualCoordinates(landmark);
 
         // Set the radius and centre of the circle
         innerCircle.setCenterX(actualCoordinates.getX());
         innerCircle.setCenterY(actualCoordinates.getY());
-        innerCircle.setRadius(5);
         innerCircle.setFill(color);
-
-        outerRing.setCenterX(actualCoordinates.getX());
-        outerRing.setCenterY(actualCoordinates.getY());
-        outerRing.setRadius(5); // Slightly larger radius for the outer ring
-        outerRing.setFill(Color.TRANSPARENT);
-        outerRing.setStroke(color);
-        outerRing.setStrokeWidth(2);
+        innerCircle.setRadius(5);
     }
 
     private void drawFirstCircle(Landmark landmark) {
-        // Remove any existing circle
-        if (firstLandmarkCircle != null) {
-            mapPane.getChildren().removeAll(firstLandmarkCircle, firstLandmarkRing);
+        // Remove any existing circle for the start landmark
+        if (startLandmarkCircle != null) {
+            imageViewPane.getChildren().removeAll(startLandmarkCircle);
         }
-        // Makes a new circle on the landmark picked
-        firstLandmarkCircle = new Circle();
-        firstLandmarkRing = new Circle();
-        createLandmarkCircle(firstLandmarkCircle, firstLandmarkRing, landmark, Color.RED);
-        // puts new circle on the map pane
-        mapPane.getChildren().addAll(firstLandmarkCircle, firstLandmarkRing);
+        // Adds a new circle on the landmark to the map
+        startLandmarkCircle = new Circle();
+        createLandmarkCircle(startLandmarkCircle, landmark, Color.RED);
+        imageViewPane.getChildren().addAll(startLandmarkCircle);
     }
 
     // This method draws an aqua circle on the selected destination
     private void drawDestinationCircle(Landmark landmark) {
-        // Remove any existing end landmark circle and outer ring from the mapPane
+        // Remove any existing circle for the destination landmark
         if (destinationLandmarkCircle != null) {
-            mapPane.getChildren().removeAll(destinationLandmarkCircle, destinationLandmarkOuterRing);
+            imageViewPane.getChildren().removeAll(destinationLandmarkCircle);
         }
-        // Create a new circle and outer ring with the specified landmark and color
+        // Adds a new circle on the landmark to the map
         destinationLandmarkCircle = new Circle();
-        destinationLandmarkOuterRing = new Circle();
-        createLandmarkCircle(destinationLandmarkCircle, destinationLandmarkOuterRing, landmark, Color.BLUE);
-        // Add the new circle and outer ring to the mapPane
-        mapPane.getChildren().addAll(destinationLandmarkCircle, destinationLandmarkOuterRing);
-    }
-
-    private void selectMenuItem(MenuButton menuButton, String landmarkName) {
-        // Iterate through menuButton's items list and select item with matching landmarkName
-        for (MenuItem item : menuButton.getItems()) {
-            if (item.getText().equals(landmarkName)) {
-                // Set menuButton's text to selected item's text
-                menuButton.setText(item.getText());
-                break;
-            }
-        }
-    }
-
-    public void clearMap(ActionEvent actionEvent) {
-        //clear lines
-        mapPane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
-        //clear listview
-        routeOutput.getItems().clear();
+        createLandmarkCircle(destinationLandmarkCircle, landmark, Color.BLUE);
+        imageViewPane.getChildren().addAll(destinationLandmarkCircle);
     }
 
 
-    public void initialize(URL url, ResourceBundle resourceBundle){
-        maincon = this; // Set the maincon to this instance of the controller
-    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
     public void bfsSearch(ActionEvent actionEvent) {
         // Determine the shortest route between the selected starting and destination landmarks using the Graph's findShortestPath method
-        Path shortestRoute = graph.bfsAlgorithm(firstSelectedLandmark, selectedDestinationLandmark);
+        Path shortestRoute = graph.bfsAlgorithm(selectedStartLandmark, selectedDestinationLandmark);
 
         // Display an error message if no path is found
         if (shortestRoute == null) {
@@ -449,13 +370,13 @@ public class RouteFinderController {
 
             // Print the line changes
             System.out.println(String.join("\n", lineChanges));
-            drawShortestPath(shortestRoute);
+            drawLine();
 
             // Update the ListView
             List<String> outputLines = new ArrayList<>();
 
             // Add the BFS header indicating the starting and destination landmarks
-            outputLines.add("\nBFS: " + firstSelectedLandmark.getLandmarkName() + " to " + selectedDestinationLandmark.getLandmarkName());
+            outputLines.add("\nBFS: " + selectedStartLandmark.getLandmarkName() + " to " + selectedDestinationLandmark.getLandmarkName());
             // Iterate over the landmarks in the path and add appropriate markers
             for (int i = 0; i < path.size(); i++) {
                 if (i == 0 || i == path.size() - 1) {
@@ -489,7 +410,6 @@ public class RouteFinderController {
     }
 
 
-    /*
     public static void traverseGraphDepthFirst(GraphNode<?> from, List<GraphNode<?>> encountered){
         System.out.println(from.data);
         if(encountered==null) encountered=new ArrayList<>();
