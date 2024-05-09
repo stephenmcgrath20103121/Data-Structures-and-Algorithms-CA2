@@ -70,23 +70,23 @@ public class RouteFinderController {
             System.out.println("Map already populated");
             return;
         }
-        String csvData = "Quai Jacques Chirac,Eiffel Tower,235,378\n" +
-                "Bd. de Ménilmontant,Cimetière du Père-Lachaise,943,345\n" +
-                "Pl. du Panthéon,Panthéon,614,513\n"+
-                "Av. des Champs-Élysées,Arc de Triomphe,242,205\n"+
-                "Rue du Cloitre Notre Dame,Cathédrale Notre-Dame de Paris,649,436\n"+
-                "Bd. du Palais,Sainte-Chapelle,613,409\n"+
-                "Quoi du Louvre,Musée du Louvre,551,348\n"+
-                "Pl. de la Concorde,Place de la Concorde,435,297\n"+
-                "Rue Auber,Palais Garnier,521,223\n"+
-                "Bd. Saint-Michel,Jardin du Luxembourg,547,510\n"+
-                "Rue de la Cardinal Guibert,Basilique du Sacré-Cœur,584,52\n"+
-                "Av. des Champs-Élysées,Champs-Élysées,419,289\n"+
-                "Bd. des Invalides,Hôtel des Invalides,371,399\n"+
-                "Pl. Denfert-Rochereau,Les Catacombes de Paris,511,634\n"+
-                "Quai Saint-Bernard,Institut du Monde Arabe,691,484\n"+
-                "Rue Cuvier,Muséum National d'Histoire Naturelle,701,540\n"+
-                "Pont de Grenelle,Statue de la Liberté Paris,130,472\n";
+        String csvData = "Quai Jacques Chirac,Eiffel Tower,201,345\n" +
+                "Bd. de Ménilmontant,Cimetière du Père-Lachaise,909,312\n" +
+                "Pl. du Panthéon,Panthéon,580,480\n"+
+                "Av. des Champs-Élysées,Arc de Triomphe,208,172\n"+
+                "Rue du Cloitre Notre Dame,Cathédrale Notre-Dame de Paris,615,403\n"+
+                "Bd. du Palais,Sainte-Chapelle,579,376\n"+
+                "Quoi du Louvre,Musée du Louvre,517,315\n"+
+                "Pl. de la Concorde,Place de la Concorde,401,264\n"+
+                "Rue Auber,Palais Garnier,487,190\n"+
+                "Bd. Saint-Michel,Jardin du Luxembourg,513,477\n"+
+                "Rue de la Cardinal Guibert,Basilique du Sacré-Cœur,550,19\n"+
+                "Av. des Champs-Élysées,Champs-Élysées,385,256\n"+
+                "Bd. des Invalides,Hôtel des Invalides,337,366\n"+
+                "Pl. Denfert-Rochereau,Les Catacombes de Paris,477,601\n"+
+                "Quai Saint-Bernard,Institut du Monde Arabe,657,451\n"+
+                "Rue Cuvier,Muséum National d'Histoire Naturelle,667,507\n"+
+                "Pont de Grenelle,Statue de la Liberté Paris,96,439\n";
 
 
         Map<String, Road> roads = parseCSVData(csvData);
