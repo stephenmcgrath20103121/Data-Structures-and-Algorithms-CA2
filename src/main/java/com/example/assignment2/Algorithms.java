@@ -82,6 +82,49 @@ public class Algorithms {
         return path;
     }
 
+    public static List<GraphNode<String>> Dijkstra(List<GraphNode<String>> graph,GraphNode<String> start, GraphNode<String> destination){
+
+
+        //Generating the Queue, Visited and Previous
+        Queue<GraphNode<String>> queue = new LinkedList<>();
+
+        HashMap <GraphNode<String>, GraphNode<String>> previous = new HashMap<>();
+
+        Map<GraphNode<String>, Integer> cost = new HashMap<>();
+
+        for (GraphNode<String> node : graph){
+            cost.put(node, Integer.MAX_VALUE);
+        }
+        cost.put(start,0);
+
+        queue.add(start);
+
+        while (queue.size() != 0){
+
+            GraphNode<String> current = queue.poll();
+
+            // Go through each edge
+            for (GraphLink edge : current.getAdjList()){
+
+                GraphNode next = edge.getDestNode();
+
+                int nextCost = edge.getCost();
+
+                //if the cost from the current + cost is less then the path we take then update
+                if (cost.get(current) + nextCost < cost.get(next)){
+                    cost.put(next, cost.get(current) + nextCost);
+
+                    previous.put(next, current);
+
+                    queue.add(next);
+                }
+            }
+        }
+        // Sets the path
+        path = getNodeListFromMap(previous, start, destination);
+        return path;
+    }
+
     public static List<GraphNode<String>> getNodeListFromMap(HashMap<GraphNode<String>, GraphNode<String>> previous,GraphNode<String> start,GraphNode<String> destination){
         List<GraphNode<String>> path=new ArrayList<>();
         while(!destination.equals(start)){

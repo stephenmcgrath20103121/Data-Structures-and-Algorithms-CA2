@@ -38,12 +38,12 @@ public class RouteFinderController {
 
     @FXML
     public Button clearMap;
-
     @FXML
     public Button bfsButton;
-
     @FXML
     public Button dfsButton;
+    @FXML
+    public Button dijkstraButton;
 
     private boolean isMapPopulated = false;
 
@@ -254,6 +254,11 @@ public class RouteFinderController {
 
     public void processDfs(){
         List<GraphNode<String>> pathNodeList=Algorithms.dfs(selectedStartGraphNode,selectedDestinationGraphNode);
+        drawLine(pathNodeList);
+    }
+
+    public void processDijkstra(){
+        List<GraphNode<String>> pathNodeList=Algorithms.Dijkstra(graph.getAllGraphNodes(),selectedStartGraphNode,selectedDestinationGraphNode);
         drawLine(pathNodeList);
     }
 }

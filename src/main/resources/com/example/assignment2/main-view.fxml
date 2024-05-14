@@ -34,6 +34,7 @@
          <Button fx:id="clearMap" layoutX="1259.0" layoutY="635.0" mnemonicParsing="false" onAction="#clearMap" prefHeight="50.0" prefWidth="82.0" text="Clear Map" />
          <Button fx:id="bfsButton" layoutX="1208.0" layoutY="145.0" mnemonicParsing="false" onAction="#processBfs" prefHeight="50.0" prefWidth="184.0" text="Find Shortest Path Through BFS" />
             <Button fx:id="dfsButton" layoutX="1208.0" layoutY="248.0" mnemonicParsing="false" onAction="#processDfs" prefHeight="50.0" prefWidth="184.0" text="Find Path Through DFS" />
+            <Button fx:id="dijkstraButton" layoutX="1208.0" layoutY="351.0" mnemonicParsing="false" onAction="#processDijkstra" prefHeight="50.0" prefWidth="184.0" text="Find Shortest Path Through Dijkstra's Algorithm" />
         </children>
     </AnchorPane>
 </AnchorPane>

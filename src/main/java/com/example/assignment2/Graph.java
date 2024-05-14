@@ -81,7 +81,11 @@ public class Graph implements Initializable {
             }
         }
     }
-    
+
+    public List<GraphNode<String>> getAllGraphNodes() {
+        return allGraphNodes;
+    }
+
     // Method to initialize the Graph object
     public void initialize(URL url, ResourceBundle resourceBundle){
         // Set the static graph object to this

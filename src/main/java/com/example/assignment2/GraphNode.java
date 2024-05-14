@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GraphNode<T> {
-    public T data;
     public List<GraphLink<T>> adjList=new ArrayList<>();
     public String name="";
     public int x=0;
@@ -35,6 +34,10 @@ public class GraphNode<T> {
         return y;
     }
 
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public List<GraphLink<T>> getAdjList() {
         return adjList;
     }
@@ -43,9 +46,7 @@ public class GraphNode<T> {
         this.adjList = adjList;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
+
     public void connectToNodeUndirected(GraphNode<T> destNode,int cost) {
         destNode.adjList.add( new GraphLink<>(this, cost) );
     }
