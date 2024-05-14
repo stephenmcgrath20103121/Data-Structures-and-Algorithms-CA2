@@ -35,11 +35,22 @@ public class GraphNode<T> {
         return y;
     }
 
+    public List<GraphLink<T>> getAdjList() {
+        return adjList;
+    }
+
+    public void setAdjList(List<GraphLink<T>> adjList) {
+        this.adjList = adjList;
+    }
+
     public void setY(int y) {
         this.y = y;
     }
     public void connectToNodeUndirected(GraphNode<T> destNode,int cost) {
-        adjList.add( new GraphLink<>(destNode,cost) );
         destNode.adjList.add( new GraphLink<>(this, cost) );
+    }
+
+    public int getIndex(){
+        return ((getY() * 1065) + getX());
     }
 }

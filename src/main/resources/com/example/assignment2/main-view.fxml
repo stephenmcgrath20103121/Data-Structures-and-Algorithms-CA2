@@ -9,7 +9,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.assignment2.RouteFinderController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.assignment2.RouteFinderController">
 
           <MenuBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="29.0" prefWidth="800.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Menu mnemonicParsing="false" text="File">
@@ -22,17 +22,18 @@
             <MenuItem mnemonicParsing="false" text="About" />
         </Menu>
     </MenuBar>
-    <AnchorPane fx:id="imageViewPane" layoutX="14.0" layoutY="41.0" prefHeight="350.0" prefWidth="780.0">
+    <AnchorPane fx:id="imageViewPane" layoutX="14.0" layoutY="41.0" prefHeight="849.0" prefWidth="1577.0">
         <children>
-            <ImageView fx:id="imageView" fitHeight="339.0" fitWidth="652.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="imageView" fitHeight="693.0" fitWidth="1059.0" pickOnBounds="true" preserveRatio="true">
                 <image>
                     <Image url="@../../../../java/com/example/Paris.JPG" />
                 </image>
             </ImageView>
-            <MenuButton fx:id="startLandmark" layoutX="602.0" layoutY="64.0" mnemonicParsing="false" text="Source Landmark" />
-            <MenuButton fx:id="destinationLandmark" layoutX="590.0" layoutY="108.0" mnemonicParsing="false" text="Destination Landmark" />
-         <Button fx:id="clearMap" layoutX="629.0" layoutY="285.0" mnemonicParsing="false" onAction="#clearMap" text="Clear Map" />
-         <Button fx:id="bfsButton" layoutX="607.0" layoutY="157.0" mnemonicParsing="false" onAction="#drawLine" text="Find Shortest Path" />
+            <MenuButton fx:id="startGraphNode" layoutX="1068.0" layoutY="48.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Source Landmark" />
+            <MenuButton fx:id="destinationGraphNode" layoutX="1343.0" layoutY="48.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Destination Landmark" />
+         <Button fx:id="clearMap" layoutX="1259.0" layoutY="635.0" mnemonicParsing="false" onAction="#clearMap" prefHeight="50.0" prefWidth="82.0" text="Clear Map" />
+         <Button fx:id="bfsButton" layoutX="1208.0" layoutY="145.0" mnemonicParsing="false" onAction="#processBfs" prefHeight="50.0" prefWidth="184.0" text="Find Shortest Path Through BFS" />
+            <Button fx:id="dfsButton" layoutX="1208.0" layoutY="248.0" mnemonicParsing="false" onAction="#processDfs" prefHeight="50.0" prefWidth="184.0" text="Find Path Through DFS" />
         </children>
     </AnchorPane>
 </AnchorPane>

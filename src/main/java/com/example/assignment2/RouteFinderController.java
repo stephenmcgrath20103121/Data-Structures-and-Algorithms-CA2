@@ -3,8 +3,6 @@ package com.example.assignment2;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -18,7 +16,7 @@ import java.util.*;
 
 public class RouteFinderController {
     @FXML
-    private Image displayImage;
+    private WritableImage displayImage;
     @FXML
     private ImageView imageView;
 
@@ -27,7 +25,7 @@ public class RouteFinderController {
 
     private Graph graph = new Graph(); //Will be used to store the graph
 
-    private Map<String, GraphNode<String>> nodes = new HashMap<>(); //Will be used to store all nodes
+    private Map<String, GraphNode<String>> landmarks = new HashMap<>(); //Will be used to store all landmarks
 
     @FXML
     public MenuButton startGraphNode=new MenuButton();
@@ -44,49 +42,61 @@ public class RouteFinderController {
     @FXML
     public Button bfsButton;
 
+    @FXML
+    public Button dfsButton;
+
     private boolean isMapPopulated = false;
 
     public void initialize () throws FileNotFoundException {
         initialiseMap();
-        initialiseGraphNodes();
     }
 
     public void initialiseMap() throws FileNotFoundException {
         Image image = new Image(new FileInputStream("src/main/java/com/example/Paris.JPG"));
-        displayImage = image;
+        WritableImage writableImage=new WritableImage((int)image.getWidth(),(int)image.getHeight());
+        PixelReader pixelReader= image.getPixelReader();
+        PixelWriter pixelWriter= writableImage.getPixelWriter();
+        for(int y=0;y<image.getHeight();y++){
+            for(int x=0;x<image.getWidth();x++){
+                Color color= pixelReader.getColor(x,y);
+                pixelWriter.setColor(x,y,color);
+            }
+        }
+        displayImage = writableImage;
         imageView.setImage(image);
         // Check if the map is populated
         if (isMapPopulated) {
             System.out.println("Map already populated");
             return;
         }
-        String csvData = "Eiffel Tower,201,345\n" +
-                "Cimetière du Père-Lachaise,909,312\n" +
-                "Panthéon,580,480\n"+
-                "Arc de Triomphe,208,172\n"+
+        String csvData = "Eiffel Tower,195,339\n" +
+                "Cimetière du Père-Lachaise,878,338\n" +
+                "Panthéon,580,484\n"+
+                "Arc de Triomphe,202,168\n"+
                 "Cathédrale Notre-Dame de Paris,615,403\n"+
-                "Sainte-Chapelle,579,376\n"+
-                "Musée du Louvre,517,315\n"+
-                "Place de la Concorde,401,264\n"+
-                "Palais Garnier,487,190\n"+
-                "Jardin du Luxembourg,513,477\n"+
-                "Basilique du Sacré-Cœur,550,19\n"+
-                "Champs-Élysées,385,256\n"+
-                "Hôtel des Invalides,337,366\n"+
-                "Les Catacombes de Paris,477,601\n"+
-                "Institut du Monde Arabe,657,451\n"+
-                "Muséum National d'Histoire Naturelle,667,507\n"+
-                "Statue de la Liberté Paris,96,439\n";
+                "Sainte-Chapelle,585,379\n"+
+                "Musée du Louvre,520,303\n"+
+                "Place de la Concorde,397,264\n"+
+                "Palais Garnier,487,183\n"+
+                "Jardin du Luxembourg,486,456\n"+
+                "Basilique du Sacré-Cœur,564,20\n"+
+                "Champs-Élysées,385,258\n"+
+                "Hôtel des Invalides,321,352\n"+
+                "Les Catacombes de Paris,480,600\n"+
+                "Institut du Monde Arabe,657,447\n"+
+                "Muséum National d'Histoire Naturelle,652,512\n"+
+                "Statue de la Liberté Paris,96,436\n";
 
 
-        nodes = parseCSVData(csvData);
-        // Iterate over the nodes and print their nodes
-        for (Map.Entry<String, GraphNode<String>> entry : nodes.entrySet()) {
+        landmarks = parseCSVData(csvData);
+        initialiseGraphNodes();
+        // Iterate over the landmarks and print their nodes
+        for (Map.Entry<String, GraphNode<String>> entry : landmarks.entrySet()) {
             System.out.println(entry.getKey());
             System.out.println("\t" + entry.getValue().getName()+ " (" + entry.getValue().getX() + "," + entry.getValue().getY() + ")\n");
         }
 
-        populateMenuButtons(nodes);
+        populateMenuButtons(landmarks);
 
 
         //After filling the map, set the boolean to true.
@@ -94,17 +104,17 @@ public class RouteFinderController {
     }
 
     public void initialiseGraphNodes() throws FileNotFoundException {
-        graph.addGraphNodesToList();
+        List<GraphNode<String>> nodes=graph.addGraphNodesToList(landmarks);
+        for (Map.Entry<String, GraphNode<String>> entry : landmarks.entrySet()) {
+            String key=entry.getKey();
+            GraphNode<String> currentNode=nodes.get(entry.getValue().getIndex());
+            landmarks.get(key).setAdjList(currentNode.getAdjList());
+        }
     }
 
     private void populateMenuButtons(Map<String, GraphNode<String>> lines) {
         List<GraphNode<String>> uniqueGraphNodesList = new ArrayList<>();
-        // Loop through each GraphNode<String> object in the lines Map
-            // Loop through each GraphNode<String> object in the GraphNode<String>'s nodes
-            // Add the node to the uniqueGraphNode<String>s set
-            uniqueGraphNodesList.addAll(lines.values());
-        // Convert the Set to a List
-
+        uniqueGraphNodesList.addAll(lines.values());
         // Sort list of nodes alphabetically
         uniqueGraphNodesList.sort(Comparator.comparing(GraphNode::getName));
         startGraphNode.getItems().addAll(createGraphNodeMenuItems(uniqueGraphNodesList));
@@ -170,16 +180,20 @@ public class RouteFinderController {
         return nodes;
     }
 
-    public void drawLine() {
-        GraphNode<String> startGraphNode=new GraphNode<>(selectedStartGraphNode.getName(), selectedStartGraphNode.getX(),selectedStartGraphNode.getY());
-        Canvas canvas = new Canvas(displayImage.getWidth(), displayImage.getHeight());
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.drawImage(displayImage, 0, 0, displayImage.getWidth(), displayImage.getHeight());
-        gc.setStroke(Color.ORANGE);
-        gc.setLineWidth(5);
-        gc.strokeLine(startGraphNode.getX(), startGraphNode.getY(), selectedDestinationGraphNode.getX(), selectedDestinationGraphNode.getY());
-        WritableImage image = new WritableImage((int) displayImage.getWidth(), (int) displayImage.getHeight());
-        canvas.snapshot(null, image);
+    public void drawLine(List<GraphNode<String>> nodeList) {
+        WritableImage image=new WritableImage((int)displayImage.getWidth(),(int)displayImage.getHeight());
+        PixelReader pixelReader= displayImage.getPixelReader();
+        PixelWriter pixelWriter= image.getPixelWriter();
+        for(int y=0;y<displayImage.getHeight();y++){
+            for(int x=0;x<displayImage.getWidth();x++){
+                Color color= pixelReader.getColor(x,y);
+                pixelWriter.setColor(x,y,color);
+            }
+        }
+
+        for(int i=0;i< nodeList.size();i++){
+            pixelWriter.setColor(nodeList.get(i).getX(),nodeList.get(i).getY(),Color.NAVY);
+        }
         imageView.setImage(image);
     }
 
@@ -231,5 +245,15 @@ public class RouteFinderController {
         destinationGraphNodeCircle = new Circle();
         createGraphNodeCircle(destinationGraphNodeCircle, node, Color.BLUE);
         imageViewPane.getChildren().addAll(destinationGraphNodeCircle);
+    }
+
+    public void processBfs(){
+        List<GraphNode<String>> pathNodeList=Algorithms.bfs(selectedStartGraphNode,selectedDestinationGraphNode);
+        drawLine(pathNodeList);
+    }
+
+    public void processDfs(){
+        List<GraphNode<String>> pathNodeList=Algorithms.dfs(selectedStartGraphNode,selectedDestinationGraphNode);
+        drawLine(pathNodeList);
     }
 }
