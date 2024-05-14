@@ -104,7 +104,8 @@ public class RouteFinderController {
     }
 
     public void initialiseGraphNodes() throws FileNotFoundException {
-        List<GraphNode<String>> nodes=graph.addGraphNodesToList(landmarks);
+        graph.addGraphNodesToList(landmarks);
+        List<GraphNode<String>> nodes=graph.getAllGraphNodes();
         for (Map.Entry<String, GraphNode<String>> entry : landmarks.entrySet()) {
             String key=entry.getKey();
             GraphNode<String> currentNode=nodes.get(entry.getValue().getIndex());

@@ -15,7 +15,7 @@ public class Graph implements Initializable {
     public static Graph graph;
     public List<GraphNode<String>> allGraphNodes=new ArrayList<>();
 
-    public List<GraphNode<String>> addGraphNodesToList(Map<String, GraphNode<String>> nodeMap) throws FileNotFoundException {
+    public void addGraphNodesToList(Map<String, GraphNode<String>> nodeMap) throws FileNotFoundException {
         allGraphNodes.addAll(nodeMap.values());
         Image image = new Image(new FileInputStream("src/main/java/com/example/bwImage.JPG"));
         PixelReader pixelReader= image.getPixelReader();
@@ -40,7 +40,6 @@ public class Graph implements Initializable {
         }
         allGraphNodes.sort(Comparator.comparing(GraphNode::getIndex));
         linkGraphNodes(image);
-        return allGraphNodes;
     }
 
      public void linkGraphNodes(Image image){

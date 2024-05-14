@@ -83,8 +83,6 @@ public class Algorithms {
     }
 
     public static List<GraphNode<String>> Dijkstra(List<GraphNode<String>> graph,GraphNode<String> start, GraphNode<String> destination){
-
-
         //Generating the Queue, Visited and Previous
         Queue<GraphNode<String>> queue = new LinkedList<>();
 
